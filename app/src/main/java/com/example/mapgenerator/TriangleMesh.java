@@ -27,6 +27,7 @@ public class TriangleMesh {
         faceBuffer.put((short) vertices[1]);
         faceBuffer.put((short) vertices[2]);
 
-
+        verticesBuffer.position(0);
+        faceBuffer.position(0);
     }
 }
