@@ -4,11 +4,11 @@ import java.util.Arrays;
 
 public class MapGenerator {
 
-    int mapWidth;
-    int mapHeight;
+    public final int mapWidth;
+    public final int mapHeight;
     float scale;
     float[] offset;
-    int lod; // level of detail
+    public final int lod; // level of detail
 
     private MapLayer[] generators;
 
@@ -30,7 +30,7 @@ public class MapGenerator {
     }
 
     public float[] composeMap(){
-        float[] mapSum = new float[mapWidth/lod * mapHeight/lod];
+        float[] mapSum = new float[mapWidth * mapHeight];
         Arrays.fill(mapSum, 1f);
 
         for(MapLayer map : generators){
@@ -40,27 +40,37 @@ public class MapGenerator {
             map.GenerateMapLayer(mapSum);
         }
 
-        for(int y = 0; y < mapHeight/lod; y++){
-            for(int x = 0; x < mapWidth/lod; x++){
-                mapSum[y*mapWidth/lod + x] = Math.max(mapSum[y*mapWidth/lod + x], 0.001f);
-                mapSum[y*mapWidth/lod + x] = Math.min(mapSum[y*mapWidth/lod + x], 0.999f);
+        for(int y = 0; y < mapHeight; y++){
+            for(int x = 0; x < mapWidth; x++){
+                mapSum[y*mapWidth + x] = Math.max(mapSum[y*mapWidth + x], 0.001f);
+                mapSum[y*mapWidth + x] = Math.min(mapSum[y*mapWidth + x], 0.999f);
             }
         }
 
         return mapSum;
     }
 
-    public int[] getDimensions(){
-        int[] dim = {mapWidth, mapHeight};
-        return dim;
-    }
 
     public int getLevelOfDetail(){
         return lod;
     }
 
     public int[] getAdjustedDimensions(){
-        int[] adj_dim = {mapWidth/lod, mapHeight/lod};
-        return adj_dim;
+        return new int[]{mapWidth/lod, mapHeight/lod};
+    }
+
+    public static float[] texture(float height){
+//        float[] a = {1-height, 1-height, 1-height, 1.0f};
+//        return a;
+        if(height < 0.3){
+            return new float[]{0.3f, 0.0f, 1.0f, 1.0f};
+        }
+        if(height < 0.4f){
+            return new float[]{0.0f, 0.0f, 1.0f, 1.0f};
+        }
+        if(height < 0.7f){
+            return new float[]{1.0f, 0.0f, 0.0f, 1.0f};
+        }
+        return new float[]{0.0f, 1.0f, 0.0f, 1.0f};
     }
 }

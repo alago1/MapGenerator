@@ -13,7 +13,7 @@ public class NoiseMap extends MapLayer {
     private OpenSimplexNoise noise;
 
 
-    public NoiseMap(MapGenerator parentGen, int seed, int octaves, float persistence, float lacunarity){
+    NoiseMap(MapGenerator parentGen, int seed, int octaves, float persistence, float lacunarity){
         // Sets all necessary variables in the object
         // Assumes the map is intended to show; if that is not the case call NoiseMap.DisableShow()
         super(parentGen);
@@ -22,14 +22,14 @@ public class NoiseMap extends MapLayer {
         this.octaves = octaves;
         this.persistence = persistence;
         this.lacunarity = lacunarity;
-        this.noise = new OpenSimplexNoise((long) seed);
+        this.noise = new OpenSimplexNoise(seed);
     }
 
 
     @Override
     public void GenerateMapLayer(float[] map){
-        int[] adj_dim = parentGen.getAdjustedDimensions();
-        float[] noiseMap = new float[adj_dim[0]*adj_dim[1]];
+        int[] dim = {parentGen.mapWidth, parentGen.mapHeight};
+        float[] noiseMap = new float[dim[0]*dim[1]];
 
         Random prng = new Random(seed);
         float[][] octaveOffsets = new float[octaves][2];
@@ -45,16 +45,16 @@ public class NoiseMap extends MapLayer {
         float maxNoiseHeight = -Float.MAX_VALUE;
         float minNoiseHeight = Float.MAX_VALUE;
 
-        for(int y = 0; y < adj_dim[1]; y++){
-            for(int x = 0; x < adj_dim[0]; x++){
+        for(int y = 0; y < dim[1]; y++){
+            for(int x = 0; x < dim[0]; x++){
 
                 float amplitude = 1;
                 float frequency = 1;
                 float noiseHeight = 0;
 
                 for(int i = 0; i < octaves; i++){
-                    float sampleX = (x-adj_dim[0]/2f)/parentGen.scale * frequency + octaveOffsets[i][0];
-                    float sampleY = (y-adj_dim[1]/2f)/parentGen.scale * frequency + octaveOffsets[i][1];
+                    float sampleX = (x-dim[0]/2f)/parentGen.scale * frequency + octaveOffsets[i][0];
+                    float sampleY = (y-dim[1]/2f)/parentGen.scale * frequency + octaveOffsets[i][1];
 
                     noiseHeight += (float) noise.eval(sampleX, sampleY) * amplitude;
 
@@ -62,7 +62,7 @@ public class NoiseMap extends MapLayer {
                     frequency *= lacunarity;
                 }
 
-                noiseMap[y*adj_dim[0] + x] = noiseHeight;
+                noiseMap[y*dim[0] + x] = noiseHeight;
 
                 if(noiseHeight > maxNoiseHeight){
                     maxNoiseHeight = noiseHeight;
@@ -73,9 +73,9 @@ public class NoiseMap extends MapLayer {
         }
 
 
-        for(int y = 0; y < adj_dim[1]; y++){
-            for(int x = 0; x < adj_dim[0]; x++){
-                map[y*adj_dim[0] + x] *= MapLayer.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[y*adj_dim[0] + x]);
+        for(int y = 0; y < dim[1]; y++){
+            for(int x = 0; x < dim[0]; x++){
+                map[y*dim[0] + x] *= MapLayer.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[y*dim[0] + x]);
             }
         }
     }

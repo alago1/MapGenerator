@@ -5,10 +5,10 @@ import MapClasses.MapLayer;
 
 public class FalloffMap extends MapLayer {
 
-    float intensity; // 3f
-    float fallOffset; // 2.2f
+    private float intensity; // 3f
+    private float fallOffset; // 2.2f
 
-    public FalloffMap(MapGenerator parentGen, float intensity, float fallOffset){
+    FalloffMap(MapGenerator parentGen, float intensity, float fallOffset){
         super(parentGen);
 
         this.intensity = intensity;
@@ -16,21 +16,21 @@ public class FalloffMap extends MapLayer {
     }
 
     public void GenerateMapLayer(float[] map){
-        int[] adj_dim = parentGen.getAdjustedDimensions();
+        int[] dim = {parentGen.mapWidth, parentGen.mapHeight};
 
-        for(int y = 0; y < adj_dim[1]; y++){
-            for(int x = 0; x < adj_dim[0]; x++){
-                float dx = (x)/(float)adj_dim[0];
-                float dy = (y)/(float)adj_dim[1];
+        for(int y = 0; y < dim[1]; y++){
+            for(int x = 0; x < dim[0]; x++){
+                float dx = (x)/(float)dim[0];
+                float dy = (y)/(float)dim[1];
                 float value = Math.abs(dx-dy) + Math.abs(dx+dy);
-                map[y*adj_dim[0] + x] *= 1-SmoothEnds(value);
+                map[y*dim[0] + x] *= 1-SmoothEnds(value);
             }
         }
 //        MapLayer.Normalize(falloffMap);
     }
 
 
-    static float fastPow(float a, float b){
+    private static float fastPow(float a, float b){
         // not completely accurate but fast and good approximation of a^b
 
         int pwr_int = (int) b;
@@ -44,7 +44,7 @@ public class FalloffMap extends MapLayer {
         return percent * prod + (1 - percent) * prod * a;
     }
 
-    float SmoothEnds(float value){
+    private float SmoothEnds(float value){
 
         //return Math.Pow(value, intensity) / (Math.Pow(value, intensity) + Math.Pow(mapOffset-mapOffset*value, intensity));
         float a = fastPow(value, intensity);
