@@ -16,14 +16,13 @@ public class FalloffMap extends MapLayer {
     }
 
     public void GenerateMapLayer(float[] map){
-        int[] dim = {parentGen.mapWidth, parentGen.mapHeight};
-
-        for(int y = 0; y < dim[1]; y++){
-            for(int x = 0; x < dim[0]; x++){
-                float dx = (x)/(float)dim[0];
-                float dy = (y)/(float)dim[1];
+        for(int y = 0; y < parentGen.mapHeight; y++){
+            for(int x = 0; x < parentGen.mapWidth; x++){
+                // centered in the middle of the map
+                float dx = (x-parentGen.mapWidth/2f)/(float)parentGen.mapWidth;
+                float dy = (y-parentGen.mapHeight/2f)/(float)parentGen.mapHeight;
                 float value = Math.abs(dx-dy) + Math.abs(dx+dy);
-                map[y*dim[0] + x] *= 1-SmoothEnds(value);
+                map[y*parentGen.mapWidth + x] *= 1-SmoothEnds(value);
             }
         }
 //        MapLayer.Normalize(falloffMap);

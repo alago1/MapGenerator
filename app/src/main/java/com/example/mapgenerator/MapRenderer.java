@@ -28,7 +28,7 @@ public class MapRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         GLES20.glClearColor(1.0f, 0.0f,0.0f, 1.0f);
         map = mapGen.composeMap();
-        mapView = new MapView(map, mapGen, 2);
+        mapView = new MapView(map, mapGen, 3);
     }
 
     @Override

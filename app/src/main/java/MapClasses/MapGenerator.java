@@ -60,17 +60,16 @@ public class MapGenerator {
     }
 
     public static float[] texture(float height){
-//        float[] a = {1-height, 1-height, 1-height, 1.0f};
-//        return a;
-        if(height < 0.3){
-            return new float[]{0.3f, 0.0f, 1.0f, 1.0f};
-        }
-        if(height < 0.4f){
-            return new float[]{0.0f, 0.0f, 1.0f, 1.0f};
-        }
-        if(height < 0.7f){
-            return new float[]{1.0f, 0.0f, 0.0f, 1.0f};
-        }
-        return new float[]{0.0f, 1.0f, 0.0f, 1.0f};
+        return new float[]{1-height, 1-height, 1-height, 1.0f};
+//        if(height < 0.3){
+//            return new float[]{0.3f, 0.0f, 1.0f, 1.0f};
+//        }
+//        if(height < 0.4f){
+//            return new float[]{0.0f, 0.0f, 1.0f, 1.0f};
+//        }
+//        if(height < 0.7f){
+//            return new float[]{1.0f, 0.0f, 0.0f, 1.0f};
+//        }
+//        return new float[]{0.0f, 1.0f, 0.0f, 1.0f};
     }
 }

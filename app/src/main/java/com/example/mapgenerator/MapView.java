@@ -18,7 +18,6 @@ public class MapView {
     private FloatBuffer colorBuffer;
     private int nVertices;
     private int nFaces;
-    private int face_vertices;
 
     private final String vertexShaderCode = "attribute vec4 position;"+
                                         "attribute vec4 color;"+
@@ -37,20 +36,18 @@ public class MapView {
 
     private int program;
 
-
+    //FIXME: Figure out why jagged triangles are rendered in the left (Fix that)
     public MapView (float[] map, MapGenerator mapGen, int nDimensions){
         int dx = 1;
         int dy = mapGen.mapWidth/mapGen.lod;
 
         nVertices = ((mapGen.mapWidth-1)/mapGen.lod +1)*((mapGen.mapHeight-1)/mapGen.lod +1);
         nFaces = ((mapGen.mapWidth-1)/mapGen.lod) * ((mapGen.mapHeight-1)/mapGen.lod) * 2;
-//        System.out.println(nVertices + " " + nFaces);
 
         ByteBuffer vertexBB = ByteBuffer.allocateDirect(nVertices*3*4);
         vertexBB.order(ByteOrder.nativeOrder());
         verticesBuffer = vertexBB.asFloatBuffer();
 
-        //TODO: FIX THIS GARBAGE
         ByteBuffer faceBB = ByteBuffer.allocateDirect(nFaces*3*2);
         faceBB.order(ByteOrder.nativeOrder());
         facesBuffer = faceBB.asShortBuffer();
@@ -60,7 +57,6 @@ public class MapView {
         colorBuffer = colorBB.asFloatBuffer();
 
 
-        face_vertices = 0;
         int vertex_index = -1;
         float[] coords = {-1f, -1f, 0f};
         float dx_coord = 2*mapGen.lod/(float)mapGen.mapWidth;
@@ -74,13 +70,9 @@ public class MapView {
                     coords[2] = map[y * mapGen.mapWidth + x];
                 verticesBuffer.put(coords);
                 float[] texture = MapGenerator.texture(map[y*mapGen.mapWidth + x]);
+//                System.out.println(map[y*mapGen.mapWidth + x]);
+//                System.out.println(texture[0] + " " + texture[1] + " " + texture[2] + " " + texture[3]);
                 colorBuffer.put(texture);
-//                if(y <= 50 && x <= 20){
-//                    float[] color = {1.0f, 0.0f, 0.0f, 1.0f};
-//                    colorBuffer.put(color);
-//                }else {
-//                colorBuffer.put(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
-//                }
 
 
                 if (x + mapGen.lod < mapGen.mapWidth && y + mapGen.lod < mapGen.mapHeight) {
