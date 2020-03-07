@@ -68,7 +68,7 @@ public class MapView {
                 if (nDimensions == 3)
                     coords[2] = map[y * mapGen.mapWidth + x];
                 verticesBuffer.put(coords);
-                float[] texture = MapGenerator.texture(map[y*mapGen.mapWidth + x]);
+                float[] texture = mapGen.getTexture(map[y*mapGen.mapWidth + x]);
 //                System.out.println(map[y*mapGen.mapWidth + x]);
 //                System.out.println(texture[0] + " " + texture[1] + " " + texture[2] + " " + texture[3]);
                 colorBuffer.put(texture);
