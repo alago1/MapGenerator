@@ -75,7 +75,7 @@ public class MapGenerator {
 
         if(MapTexture == TextureStyle.COLOR) {
             for (int i = 0; i < terrains.length; i++) {
-                if (terrains[i].getHeight() < height)
+                if (height < terrains[i].getHeight())
                     return terrains[i].getColor();
             }
             return new float[]{0.0f, 0.0f, 0.0f, 1.0f};
