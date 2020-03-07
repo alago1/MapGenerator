@@ -12,6 +12,10 @@ public class MapGenerator {
 
     private MapLayer[] generators;
 
+    private TextureStyle MapTexture;
+    private TerrainType[] terrains;
+    public static enum TextureStyle {GRAYSCALE, COLOR};
+
     public MapGenerator(int mapWidth, int mapHeight, float scale, float[] offset, int lod){
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
@@ -59,17 +63,24 @@ public class MapGenerator {
         return new int[]{mapWidth/lod, mapHeight/lod};
     }
 
-    public static float[] texture(float height){
-        return new float[]{1-height, 1-height, 1-height, 1.0f};
-//        if(height < 0.3){
-//            return new float[]{0.3f, 0.0f, 1.0f, 1.0f};
-//        }
-//        if(height < 0.4f){
-//            return new float[]{0.0f, 0.0f, 1.0f, 1.0f};
-//        }
-//        if(height < 0.7f){
-//            return new float[]{1.0f, 0.0f, 0.0f, 1.0f};
-//        }
-//        return new float[]{0.0f, 1.0f, 0.0f, 1.0f};
+    public void CustomizeTexture(TextureStyle style, TerrainType[] terrains){
+        this.MapTexture = style;
+        this.terrains = terrains;
+    }
+
+
+    public float[] getTexture(float height){
+        if(MapTexture == TextureStyle.GRAYSCALE)
+            return new float[]{1-height, 1-height, 1-height, 1.0f};
+
+        if(MapTexture == TextureStyle.COLOR) {
+            for (int i = 0; i < terrains.length; i++) {
+                if (terrains[i].getHeight() < height)
+                    return terrains[i].getColor();
+            }
+            return new float[]{0.0f, 0.0f, 0.0f, 1.0f};
+        }
+
+        return new float[]{0.0f, 0.0f, 0.0f, 1.0f};
     }
 }
