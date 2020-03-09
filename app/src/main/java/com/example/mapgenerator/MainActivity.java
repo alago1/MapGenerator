@@ -12,14 +12,13 @@ import MapClasses.TerrainType;
 
 public class MainActivity extends AppCompatActivity {
 
-    private GLSurfaceView mapSurfaceView;
+    private MapGLSurfaceView mapSurfaceView;
     private MapRenderer mapRenderer;
     private MapGenerator mapGen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();
 
@@ -28,17 +27,18 @@ public class MainActivity extends AppCompatActivity {
 //        int minLevelOfDetail = (int) (Math.sqrt(3*width*height/Math.pow(2, 15)) + 1);
 
         //TODO: Make sure the lod is valid (sufficiently big so that the FacesBuffer fits in a Short)
-        mapSurfaceView = (GLSurfaceView) findViewById(R.id.map_surface_view);
-        mapGen = new MapGenerator(100, 100, 10f, new float[2], 1);
+        mapSurfaceView = new MapGLSurfaceView(this);
+        mapGen = new MapGenerator(200, 200, 10f, new float[]{0.0f, 0.0f}, 1);
         mapGen.UseNoiseMap(1, 4, 1.5f, 0.25f);
-        mapGen.UseFalloffMap(3f, 2.2f);
+//        mapGen.UseFalloffMap(3f, 2.2f);
         mapGen.CustomizeTexture(MapGenerator.TextureStyle.COLOR, TexturePack());
 
         mapRenderer = new MapRenderer(mapGen);
 
-        mapSurfaceView.setEGLContextClientVersion(2);
         mapSurfaceView.setRenderer(mapRenderer);
         mapSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
+        setContentView(mapSurfaceView);
     }
 
 
