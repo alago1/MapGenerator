@@ -30,11 +30,16 @@ public class MapGLSurfaceView extends GLSurfaceView {
 
         switch(e.getAction()){
             case MotionEvent.ACTION_MOVE:
-
                 float dx = x - previousX;
                 float dy = y - previousY;
 
-                renderer.setAngle(renderer.getAngle() + ((dx+dy) * TOUCH_SCALE_FACTOR));
+                if(y > getHeight()/2)
+                    dx *= -1;
+                if(x < getWidth()/2)
+                    dy *= -1;
+
+                float new_angle = renderer.getAngle() + -((dx+dy) * TOUCH_SCALE_FACTOR);
+                renderer.setAngle(new_angle);
                 requestRender();
         }
 

@@ -28,9 +28,9 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO: Make sure the lod is valid (sufficiently big so that the FacesBuffer fits in a Short)
         mapSurfaceView = new MapGLSurfaceView(this);
-        mapGen = new MapGenerator(200, 200, 10f, new float[]{0.0f, 0.0f}, 1);
+        mapGen = new MapGenerator(500, 500, 10f, new float[]{0.0f, 0.0f}, 4);
         mapGen.UseNoiseMap(1, 4, 1.5f, 0.25f);
-//        mapGen.UseFalloffMap(3f, 2.2f);
+        mapGen.UseFalloffMap(3f, 2.2f);
         mapGen.CustomizeTexture(MapGenerator.TextureStyle.COLOR, TexturePack());
 
         mapRenderer = new MapRenderer(mapGen);
