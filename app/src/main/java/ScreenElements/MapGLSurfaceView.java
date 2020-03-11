@@ -1,7 +1,8 @@
-package com.example.mapgenerator;
+package ScreenElements;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 public class MapGLSurfaceView extends GLSurfaceView {
@@ -12,10 +13,10 @@ public class MapGLSurfaceView extends GLSurfaceView {
     private float previousX;
     private float previousY;
 
-    public MapGLSurfaceView(Context context) {
-        super(context);
+    public MapGLSurfaceView(Context context, AttributeSet attrs) {
+        super(context, attrs);
 
-        this.setEGLContextClientVersion(2);
+//        this.setEGLContextClientVersion(2);
     }
 
     public void setRenderer(MapRenderer renderer) {

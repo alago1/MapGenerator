@@ -5,4 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
+
+    <ScreenElements.MapGLSurfaceView
+        android:id="@+id/map_surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="230dp"
+        tools:layout_editor_absoluteY="114dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package com.example.mapgenerator;
+package ScreenElements;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;

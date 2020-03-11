@@ -2,13 +2,14 @@ package com.example.mapgenerator;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.res.Resources;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.WindowManager;
 
 import MapClasses.MapGenerator;
 import MapClasses.TerrainType;
+import ScreenElements.MapGLSurfaceView;
+import ScreenElements.MapRenderer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,13 +22,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();
+        setContentView(R.layout.activity_main);
+
 
 //        int width = Resources.getSystem().getDisplayMetrics().widthPixels;
 //        int height = Resources.getSystem().getDisplayMetrics().heightPixels;
 //        int minLevelOfDetail = (int) (Math.sqrt(3*width*height/Math.pow(2, 15)) + 1);
 
-        //TODO: Make sure the lod is valid (sufficiently big so that the FacesBuffer fits in a Short)
-        mapSurfaceView = new MapGLSurfaceView(this);
+        //FIXME: Make sure the lod is valid (sufficiently big so that the FacesBuffer fits in a Short)
+        mapSurfaceView = findViewById(R.id.map_surface_view);
+        mapSurfaceView.setEGLContextClientVersion(2);
         mapGen = new MapGenerator(500, 500, 10f, new float[]{0.0f, 0.0f}, 4);
         mapGen.UseNoiseMap(1, 4, 1.5f, 0.25f);
         mapGen.UseFalloffMap(3f, 2.2f);
@@ -38,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         mapSurfaceView.setRenderer(mapRenderer);
         mapSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
-        setContentView(mapSurfaceView);
+
     }
 
 
