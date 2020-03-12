@@ -36,7 +36,7 @@ public class MapView {
     private int program;
 
     //FIXME: Figure out why jagged triangles are rendered in the left (Fix that)
-    public MapView (float[] map, MapGenerator mapGen, int nDimensions){
+    public MapView (float[] map, MapGenerator mapGen){
         int dx = 1;
         int dy = mapGen.mapWidth/mapGen.lod;
 
@@ -65,8 +65,7 @@ public class MapView {
             coords[0] = -1f;
             for(int x = 0; x < mapGen.mapWidth; x+=mapGen.lod) {
                 vertex_index += 1;
-                if (nDimensions == 3)
-                    coords[2] = map[y * mapGen.mapWidth + x];
+                coords[2] = map[y * mapGen.mapWidth + x];
                 verticesBuffer.put(coords);
                 float[] texture = mapGen.getTexture(map[y*mapGen.mapWidth + x]);
 //                System.out.println(map[y*mapGen.mapWidth + x]);

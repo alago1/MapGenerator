@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Switch;
 
 import MapClasses.MapGenerator;
 import MapClasses.TerrainType;
@@ -16,6 +18,11 @@ public class MainActivity extends AppCompatActivity {
     private MapGLSurfaceView mapSurfaceView;
     private MapRenderer mapRenderer;
     private MapGenerator mapGen;
+
+    // Temporary Variables for prototyping
+    // (High Chance to be deleted later):
+    Switch sw;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +49,13 @@ public class MainActivity extends AppCompatActivity {
         mapSurfaceView.setRenderer(mapRenderer);
         mapSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
-
+        sw = (Switch) findViewById(R.id.dimensions_switch);
+        sw.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                transformSpace();
+            }
+        });
     }
 
 
@@ -58,5 +71,10 @@ public class MainActivity extends AppCompatActivity {
         terrains[6] = new TerrainType("White:Snow", 1f, new float[]{1.0f, 1.0f, 1.0f, 1.0f});
 
         return terrains;
+    }
+
+    public void transformSpace(){
+        mapRenderer.setNumber_Of_Dimensions(sw.isChecked() ? 3 : 2);
+        mapSurfaceView.requestRender();
     }
 }
