@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.SeekBar;
 import android.widget.Switch;
 
 import MapClasses.MapGenerator;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     // Temporary Variables for prototyping
     // (High Chance to be deleted later):
     Switch sw;
+    SeekBar skb;
 
 
     @Override
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         mapSurfaceView.setRenderer(mapRenderer);
         mapSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
+        skb = (SeekBar) findViewById(R.id.seekBar);
         sw = (Switch) findViewById(R.id.dimensions_switch);
         sw.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -74,7 +77,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void transformSpace(){
-        mapRenderer.setNumber_Of_Dimensions(sw.isChecked() ? 3 : 2);
+        mapRenderer.setSPACE_RANK(sw.isChecked() ? 3 : 2);
+        System.out.println("Progress: " + skb.getProgress());
+        mapRenderer.setCameraAngle(skb.getProgress());
         mapSurfaceView.requestRender();
     }
 }

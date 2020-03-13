@@ -39,8 +39,8 @@ public class MapGLSurfaceView extends GLSurfaceView {
                 if(x < getWidth()/2)
                     dy *= -1;
 
-                float new_angle = renderer.getAngle() + -((dx+dy) * TOUCH_SCALE_FACTOR);
-                renderer.setAngle(new_angle);
+                float new_angle = renderer.getMapAngle() + +((dx+dy) * TOUCH_SCALE_FACTOR);
+                renderer.setMapAngle(new_angle);
                 requestRender();
         }
 

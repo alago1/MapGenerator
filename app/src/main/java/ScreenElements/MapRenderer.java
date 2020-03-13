@@ -24,8 +24,14 @@ public class MapRenderer implements GLSurfaceView.Renderer {
                                         0, 0, 0, 0,
                                         0, 0, 0, 1}; //initialized to 2D
 
-    volatile float mAngle;
-    private int Number_Of_Dimensions = 2;
+    volatile float mapAngle;
+    private float cameraAngle = 0; // angle from z-axis
+    private int SPACE_RANK = 2;
+
+    // Variables that probably will be deleted later:
+    private float[] trig_cameraAngle = {1, 0}; //cos, sin
+    float radius = 3f;
+
 
     public MapRenderer(MapGenerator mapGen){
         this.mapGen = mapGen;
@@ -44,7 +50,7 @@ public class MapRenderer implements GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height);
         float ratio = (float) width/height;
 
-        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
+        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 1,5);
     }
 
     @Override
@@ -55,28 +61,40 @@ public class MapRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(1.0f, 0.0f,0.0f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        Matrix.setLookAtM(viewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        //FIXME: Texture/Model disappears at certain mapAngles
+        Matrix.setLookAtM(viewMatrix, 0, 0, radius*trig_cameraAngle[1], radius*trig_cameraAngle[0], 0f, 0f, 0f, 0f, -trig_cameraAngle[0], trig_cameraAngle[1]);
         Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
 
-        Matrix.setRotateM(rotationMatrix, 0, mAngle, 0, 0, -1.0f);
+        Matrix.setRotateM(rotationMatrix, 0, mapAngle, 0, 0, -1.0f);
         Matrix.multiplyMM(vPRMatrix, 0, vPMatrix, 0, rotationMatrix, 0);
 
+        // VPRMatrix * dimensionMatrix * position_3d = positon_on_screen
+        // dimensionMatrix is the identity matrix with the value at the third row third column being 1 for 3D space and 0 for 2D space
         Matrix.multiplyMM(scratch, 0, vPRMatrix, 0, dimensionMatrix, 0);
 
         mapView.draw(scratch);
     }
 
 
-     public float getAngle(){
-        return mAngle;
+     public float getMapAngle(){
+        return mapAngle;
      }
 
-     public void setAngle(float angle){
-        mAngle = angle;
+     public void setMapAngle(float angle){
+        mapAngle = angle;
      }
 
-    public void setNumber_Of_Dimensions(int number_Of_Dimensions) {
-        this.Number_Of_Dimensions = number_Of_Dimensions;
-        dimensionMatrix[10] = number_Of_Dimensions - 2;
+     public float getCameraAngle() { return cameraAngle; }
+
+    public void setCameraAngle(float angle){
+        cameraAngle = (float) (angle * Math.PI / 180); // from degrees to radians
+        System.out.println("angle in radians: " + cameraAngle);
+        trig_cameraAngle[0] = (float) Math.cos(cameraAngle);
+        trig_cameraAngle[1] = (float) Math.sin(cameraAngle);
+    }
+
+    public void setSPACE_RANK(int SPACE_RANK) {
+        this.SPACE_RANK = SPACE_RANK;
+        dimensionMatrix[10] = SPACE_RANK - 2;
     }
 }
