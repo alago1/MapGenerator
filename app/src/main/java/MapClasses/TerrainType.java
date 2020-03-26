@@ -10,6 +10,7 @@ public class TerrainType {
         this.name = name;
         this.height = height;
         this.color = color;
+        assert color.length == 4;
     }
 
     public float getHeight() {

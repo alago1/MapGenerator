@@ -6,7 +6,6 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.SeekBar;
 import android.widget.Switch;
 
 import MapClasses.MapGenerator;
@@ -23,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
     // Temporary Variables for prototyping
     // (High Chance to be deleted later):
     Switch sw;
-    SeekBar skb;
 
 
     @Override
@@ -41,17 +39,17 @@ public class MainActivity extends AppCompatActivity {
         //FIXME: Make sure the lod is valid (sufficiently big so that the FacesBuffer fits in a Short)
         mapSurfaceView = findViewById(R.id.map_surface_view);
         mapSurfaceView.setEGLContextClientVersion(2);
-        mapGen = new MapGenerator(500, 500, 10f, new float[]{0.0f, 0.0f}, 4);
+        //width:500 height:500 lod:4
+        mapGen = new MapGenerator(100, 200, 10f, new float[]{0.0f, 0.0f}, 1);
         mapGen.UseNoiseMap(1, 4, 1.5f, 0.25f);
-        mapGen.UseFalloffMap(3f, 2.2f);
+//        mapGen.UseFalloffMap(3f, 2.2f);
         mapGen.CustomizeTexture(MapGenerator.TextureStyle.COLOR, TexturePack());
 
-        mapRenderer = new MapRenderer(mapGen);
+        mapRenderer = new MapRenderer(this, mapGen);
 
         mapSurfaceView.setRenderer(mapRenderer);
         mapSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
-        skb = (SeekBar) findViewById(R.id.seekBar);
         sw = (Switch) findViewById(R.id.dimensions_switch);
         sw.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -78,8 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void transformSpace(){
         mapRenderer.setSPACE_RANK(sw.isChecked() ? 3 : 2);
-        System.out.println("Progress: " + skb.getProgress());
-        mapRenderer.setCameraAngle(skb.getProgress());
         mapSurfaceView.requestRender();
     }
 }

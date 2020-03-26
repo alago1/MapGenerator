@@ -1,6 +1,13 @@
 package ScreenElements;
 
+import android.content.Context;
+import android.graphics.Shader;
 import android.opengl.GLES20;
+
+import com.example.mapgenerator.R;
+import com.mapgenerator.android.util.LoggerConfig;
+import com.mapgenerator.android.util.ShaderHelper;
+import com.mapgenerator.android.util.TextResourceReader;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -12,75 +19,94 @@ import MapClasses.MapGenerator;
 
 public class MapView {
 
+    private final Context context;
+
     private FloatBuffer verticesBuffer;
     private ShortBuffer facesBuffer;
-    private FloatBuffer colorBuffer;
     private int nVertices;
     private int nFaces;
 
-    private final String vertexShaderCode = "attribute vec4 position;"+
-                                        "attribute vec4 color;"+
-                                        "uniform mat4 matrix;"+
-                                        "varying vec4 interpolated_color;"+
-                                        "void main() {"+
-                                        "   interpolated_color = color;"+
-                                        "   gl_Position = matrix * position;"+
-                                        "}";
-
-    private final String fragmentShaderCode = "precision mediump float;"+
-                                        "varying vec4 interpolated_color;"+
-                                        "void main(){"+
-                                        "   gl_FragColor = interpolated_color;"+
-                                        "}";
+    private final String vertexShaderCode;
+    private final String fragmentShaderCode;
 
     private int program;
 
+    private static final int BYTES_PER_FLOAT = 4;
+    private static final int BYTES_PER_SHORT = 2;
+
+    private static final int POSITION_COMPONENT_COUNT = 3;
+    private static final int COLOR_COMPONENT_COUNT = 4;
+
+    private static final int VERTICES_STRIDE = (POSITION_COMPONENT_COUNT + COLOR_COMPONENT_COUNT) * BYTES_PER_FLOAT;
+
     //FIXME: Figure out why jagged triangles are rendered in the left (Fix that)
-    public MapView (float[] map, MapGenerator mapGen){
+    public MapView (Context context, float[] map, MapGenerator mapGen){
+        //Setting context reference for class
+        this.context = context;
+
+        //Reading shader's code from .glsl files in res and assigning as string to variables
+        vertexShaderCode = TextResourceReader.readTextFileFromResource(context, R.raw.vertex_shader);
+        fragmentShaderCode = TextResourceReader.readTextFileFromResource(context, R.raw.fragment_shader);
+
+        //Compiling Shaders and assigning to handles
+        int vertexShader = ShaderHelper.compileVertexShader(vertexShaderCode);
+        int fragmentShader = ShaderHelper.compileFragmentShader(fragmentShaderCode);
+
+        program = ShaderHelper.linkProgram(vertexShader, fragmentShader);
+
+        if(LoggerConfig.ON){
+            ShaderHelper.validateProgram(program);
+        }
+
+        GLES20.glUseProgram(program);
+
+
+        //TODO: Let the map returned by mapGen already have the lod taken into account
+        //mapGen stores an instance of map without lod taken into account and returns another as function of lod
+        int lod = mapGen.getLevelOfDetail();
+        int[] adj_dim = mapGen.getAdjustedDimensions();
         int dx = 1;
-        int dy = mapGen.mapWidth/mapGen.lod;
+        int dy = mapGen.mapWidth/lod;
 
-        nVertices = ((mapGen.mapWidth-1)/mapGen.lod +1)*((mapGen.mapHeight-1)/mapGen.lod +1);
-        nFaces = ((mapGen.mapWidth-1)/mapGen.lod) * ((mapGen.mapHeight-1)/mapGen.lod) * 2;
+        nVertices = map.length;
+        nFaces = ((mapGen.mapWidth-1)/lod) * ((mapGen.mapHeight-1)/lod) * 2;
 
-        ByteBuffer vertexBB = ByteBuffer.allocateDirect(nVertices*3*4);
-        vertexBB.order(ByteOrder.nativeOrder());
-        verticesBuffer = vertexBB.asFloatBuffer();
+        //allocate (nVertices * (3 position components per vertex + 4 color components per vertex) * 4 bytes per float) bytes
+        verticesBuffer = ByteBuffer.allocateDirect(nVertices*VERTICES_STRIDE)
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
 
-        ByteBuffer faceBB = ByteBuffer.allocateDirect(nFaces*3*2);
-        faceBB.order(ByteOrder.nativeOrder());
-        facesBuffer = faceBB.asShortBuffer();
-
-        ByteBuffer colorBB = ByteBuffer.allocateDirect(nVertices*4*4);
-        colorBB.order(ByteOrder.nativeOrder());
-        colorBuffer = colorBB.asFloatBuffer();
+        //allocate (nFaces * 3 vertices per face * 2 bytes per short) bytes
+        facesBuffer = ByteBuffer.allocateDirect(nFaces*3*BYTES_PER_SHORT)
+                .order(ByteOrder.nativeOrder())
+                .asShortBuffer();
 
 
-        int vertex_index = -1;
-        float[] coords = {-1f, -1f, 0f};
-        float dx_coord = 2*mapGen.lod/(float)mapGen.mapWidth;
-        float dy_coord = 2*mapGen.lod/(float)mapGen.mapHeight;
+        int vertexIndex = -1;
+        float[] coords = {-1f, 1f, 0f}; // starts at top left of the screen
+        float dx_coord = 2*lod/(float)mapGen.mapWidth;
+        float dy_coord = -2*lod/(float)mapGen.mapHeight;
 
-        for(int y = 0; y < mapGen.mapHeight; y+=mapGen.lod){
+        for(int y = 0; y < adj_dim[1]; y++){
             coords[0] = -1f;
-            for(int x = 0; x < mapGen.mapWidth; x+=mapGen.lod) {
-                vertex_index += 1;
-                coords[2] = map[y * mapGen.mapWidth + x];
+            for(int x = 0; x < adj_dim[0]; x++) {
+                vertexIndex += 1;
+                coords[2] = map[vertexIndex];
                 verticesBuffer.put(coords);
-                float[] texture = mapGen.getTexture(map[y*mapGen.mapWidth + x]);
+                float[] texture = mapGen.getTexture(map[vertexIndex]);
 //                System.out.println(map[y*mapGen.mapWidth + x]);
 //                System.out.println(texture[0] + " " + texture[1] + " " + texture[2] + " " + texture[3]);
-                colorBuffer.put(texture);
+                verticesBuffer.put(texture);
 
 
-                if (x + mapGen.lod < mapGen.mapWidth && y + mapGen.lod < mapGen.mapHeight) {
-                    facesBuffer.put((short) vertex_index);
-                    facesBuffer.put((short) (vertex_index + dy));
-                    facesBuffer.put((short) (vertex_index + dy + dx));
+                if (x + 1 < adj_dim[0] && y + 1 < adj_dim[1]) {
+                    facesBuffer.put((short) vertexIndex);
+                    facesBuffer.put((short) (vertexIndex + dy));
+                    facesBuffer.put((short) (vertexIndex + dy + dx));
 
-                    facesBuffer.put((short) vertex_index);
-                    facesBuffer.put((short) (vertex_index + dy + dx));
-                    facesBuffer.put((short) (vertex_index + dx));
+                    facesBuffer.put((short) vertexIndex);
+                    facesBuffer.put((short) (vertexIndex + dy + dx));
+                    facesBuffer.put((short) (vertexIndex + dx));
                 }
 
                 coords[0] += dx_coord;
@@ -88,38 +114,26 @@ public class MapView {
             coords[1] += dy_coord;
         }
 
-        verticesBuffer.position(0);
-        colorBuffer.position(0);
+
+        //Handles for attributes in Shaders
+        int position = GLES20.glGetAttribLocation(program, "position");
+        int color = GLES20.glGetAttribLocation(program, "color");
+
+        //Setting position for future drawing
         facesBuffer.position(0);
 
-        int vertexShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
-        int fragmentShader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-        GLES20.glShaderSource(vertexShader, vertexShaderCode);
-        GLES20.glShaderSource(fragmentShader, fragmentShaderCode);
 
-        GLES20.glCompileShader(vertexShader);
-        GLES20.glCompileShader(fragmentShader);
+        verticesBuffer.position(0);
+        GLES20.glVertexAttribPointer(position, POSITION_COMPONENT_COUNT, GLES20.GL_FLOAT, false, VERTICES_STRIDE, verticesBuffer);
+        GLES20.glEnableVertexAttribArray(position);
 
-        program = GLES20.glCreateProgram();
-
-        GLES20.glAttachShader(program, vertexShader);
-        GLES20.glAttachShader(program, fragmentShader);
-
-        GLES20.glLinkProgram(program);
-        GLES20.glUseProgram(program);
+        verticesBuffer.position(POSITION_COMPONENT_COUNT); //start of color indices in each vertex
+        GLES20.glVertexAttribPointer(color, COLOR_COMPONENT_COUNT, GLES20.GL_FLOAT, false, VERTICES_STRIDE, verticesBuffer);
+        GLES20.glEnableVertexAttribArray(color);
     }
 
 
     public void draw(float[] mvpMatrix){
-        int position = GLES20.glGetAttribLocation(program, "position");
-        int color = GLES20.glGetAttribLocation(program, "color");
-
-        GLES20.glEnableVertexAttribArray(position);
-        GLES20.glEnableVertexAttribArray(color);
-
-        GLES20.glVertexAttribPointer(position, 3, GLES20.GL_FLOAT, false, 0, verticesBuffer);
-        GLES20.glVertexAttribPointer(color, 4, GLES20.GL_FLOAT, false, 0, colorBuffer);
-
         int matrix = GLES20.glGetUniformLocation(program, "matrix");
 
         GLES20.glUniformMatrix4fv(matrix, 1, false, mvpMatrix, 0);
@@ -127,8 +141,8 @@ public class MapView {
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, nFaces*3, GLES20.GL_UNSIGNED_SHORT, facesBuffer);
 
 
-        GLES20.glDisableVertexAttribArray(color);
-        GLES20.glDisableVertexAttribArray(position);
+//        GLES20.glDisableVertexAttribArray(color);
+//        GLES20.glDisableVertexAttribArray(position);
     }
 
 }

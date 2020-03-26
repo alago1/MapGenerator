@@ -27,9 +27,9 @@ public class NoiseMap extends MapLayer {
 
 
     @Override
-    public void GenerateMapLayer(float[] map){
+    public void GenerateMapLayer(float[] map, int lod){
         int[] dim = {parentGen.mapWidth, parentGen.mapHeight};
-        float[] noiseMap = new float[dim[0]*dim[1]];
+        float[] noiseMap = new float[map.length];
 
         Random prng = new Random(seed);
         float[][] octaveOffsets = new float[octaves][2];
@@ -45,8 +45,10 @@ public class NoiseMap extends MapLayer {
         float maxNoiseHeight = -Float.MAX_VALUE;
         float minNoiseHeight = Float.MAX_VALUE;
 
-        for(int y = 0; y < dim[1]; y++){
-            for(int x = 0; x < dim[0]; x++){
+        int vertexIndex = -1;
+        for(int y = 0; y < dim[1]; y+= lod){
+            for(int x = 0; x < dim[0]; x+= lod){
+                vertexIndex += 1;
 
                 float amplitude = 1;
                 float frequency = 1;
@@ -62,7 +64,7 @@ public class NoiseMap extends MapLayer {
                     frequency *= lacunarity;
                 }
 
-                noiseMap[y*dim[0] + x] = noiseHeight;
+                noiseMap[vertexIndex] = noiseHeight;
 
                 if(noiseHeight > maxNoiseHeight){
                     maxNoiseHeight = noiseHeight;
@@ -73,10 +75,8 @@ public class NoiseMap extends MapLayer {
         }
 
 
-        for(int y = 0; y < dim[1]; y++){
-            for(int x = 0; x < dim[0]; x++){
-                map[y*dim[0] + x] *= MapLayer.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[y*dim[0] + x]);
-            }
+        for(int i = 0; i < map.length; i++){
+                map[i] *= MapLayer.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[i]);
         }
     }
 

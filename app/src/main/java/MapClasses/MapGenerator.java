@@ -8,7 +8,9 @@ public class MapGenerator {
     public final int mapHeight;
     float scale;
     float[] offset;
-    public final int lod; // level of detail
+    private int lod; // level of detail
+
+    private float[] mapComposition;
 
     private MapLayer[] generators;
 
@@ -34,24 +36,24 @@ public class MapGenerator {
     }
 
     public float[] composeMap(){
-        float[] mapSum = new float[mapWidth * mapHeight];
+        int nVertices = ((mapWidth-1)/lod +1)*((mapHeight-1)/lod +1);
+        float[] mapSum = new float[nVertices];
         Arrays.fill(mapSum, 1f);
 
         for(MapLayer map : generators){
             if(map == null || ! map.isShowing())
                 continue;
 
-            map.GenerateMapLayer(mapSum);
+            map.GenerateMapLayer(mapSum, lod);
         }
 
-        for(int y = 0; y < mapHeight; y++){
-            for(int x = 0; x < mapWidth; x++){
-                mapSum[y*mapWidth + x] = Math.max(mapSum[y*mapWidth + x], 0.001f);
-                mapSum[y*mapWidth + x] = Math.min(mapSum[y*mapWidth + x], 0.999f);
-            }
+        for(int i = 0; i < mapSum.length; i++){
+            mapSum[i] = Math.max(mapSum[i], 0.001f);
+            mapSum[i] = Math.min(mapSum[i], 0.999f);
         }
 
-        return mapSum;
+        mapComposition = mapSum;
+        return mapComposition;
     }
 
 

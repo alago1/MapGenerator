@@ -6,15 +6,13 @@ public abstract class MapLayer{
 
     MapGenerator parentGen;
     boolean show;
-    int lod;
 
     public MapLayer(MapGenerator parentGen){
         this.parentGen = parentGen;
-        this.lod = parentGen.lod;
         this.show = true;
     }
 
-    abstract void GenerateMapLayer(float[] map);
+    abstract void GenerateMapLayer(float[] map, int lod);
 
     public boolean isShowing(){
         return this.show;
