@@ -1,8 +1,8 @@
 package ScreenElements;
 
 import android.content.Context;
-import android.graphics.Shader;
 import android.opengl.GLES20;
+import android.util.Log;
 
 import com.example.mapgenerator.R;
 import com.mapgenerator.android.util.LoggerConfig;
@@ -61,8 +61,7 @@ public class MapView {
         GLES20.glUseProgram(program);
 
 
-        //TODO: Let the map returned by mapGen already have the lod taken into account
-        //mapGen stores an instance of map without lod taken into account and returns another as function of lod
+
         int lod = mapGen.getLevelOfDetail();
         int[] adj_dim = mapGen.getAdjustedDimensions();
         int dx = 1;
@@ -83,19 +82,34 @@ public class MapView {
 
 
         int vertexIndex = -1;
-        float[] coords = {-1f, 1f, 0f}; // starts at top left of the screen
-        float dx_coord = 2*lod/(float)mapGen.mapWidth;
-        float dy_coord = -2*lod/(float)mapGen.mapHeight;
+        float max_length = Math.max(mapGen.mapWidth, mapGen.mapHeight);
+        float[] coords = new float[3];
+        float[] start_coords = {-1f, 1f, 0f};
+        if(mapGen.mapWidth  == max_length){
+            float ratio = mapGen.mapHeight/(float)mapGen.mapWidth; // min/max
+            start_coords[1] *= ratio;
+        }else{
+            float ratio = mapGen.mapWidth/(float)mapGen.mapHeight;
+            start_coords[0] *= ratio;
+        }
+        coords[0] = start_coords[0];
+        coords[1] = start_coords[1];
+
+        float shift = 2*lod/max_length;
 
         for(int y = 0; y < adj_dim[1]; y++){
-            coords[0] = -1f;
+            coords[0] = start_coords[0];
             for(int x = 0; x < adj_dim[0]; x++) {
                 vertexIndex += 1;
                 coords[2] = map[vertexIndex];
                 verticesBuffer.put(coords);
                 float[] texture = mapGen.getTexture(map[vertexIndex]);
-//                System.out.println(map[y*mapGen.mapWidth + x]);
-//                System.out.println(texture[0] + " " + texture[1] + " " + texture[2] + " " + texture[3]);
+                //debug purposes:
+//                if(coords[0] < -0.8){
+//                    verticesBuffer.put(new float[]{0, 1, 0, 1});
+//                }else if(coords[1] < -0.8){
+//                    verticesBuffer.put(new float[]{0.5f, 0.5f, 0, 1});
+//                }else
                 verticesBuffer.put(texture);
 
 
@@ -109,9 +123,9 @@ public class MapView {
                     facesBuffer.put((short) (vertexIndex + dx));
                 }
 
-                coords[0] += dx_coord;
+                coords[0] += shift;
             }
-            coords[1] += dy_coord;
+            coords[1] += -shift;
         }
 
 
@@ -124,12 +138,12 @@ public class MapView {
 
 
         verticesBuffer.position(0);
-        GLES20.glVertexAttribPointer(position, POSITION_COMPONENT_COUNT, GLES20.GL_FLOAT, false, VERTICES_STRIDE, verticesBuffer);
         GLES20.glEnableVertexAttribArray(position);
+        GLES20.glVertexAttribPointer(position, POSITION_COMPONENT_COUNT, GLES20.GL_FLOAT, false, VERTICES_STRIDE, verticesBuffer);
 
         verticesBuffer.position(POSITION_COMPONENT_COUNT); //start of color indices in each vertex
-        GLES20.glVertexAttribPointer(color, COLOR_COMPONENT_COUNT, GLES20.GL_FLOAT, false, VERTICES_STRIDE, verticesBuffer);
         GLES20.glEnableVertexAttribArray(color);
+        GLES20.glVertexAttribPointer(color, COLOR_COMPONENT_COUNT, GLES20.GL_FLOAT, false, VERTICES_STRIDE, verticesBuffer);
     }
 
 
@@ -141,7 +155,6 @@ public class MapView {
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, nFaces*3, GLES20.GL_UNSIGNED_SHORT, facesBuffer);
 
 
-//        GLES20.glDisableVertexAttribArray(color);
 //        GLES20.glDisableVertexAttribArray(position);
     }
 

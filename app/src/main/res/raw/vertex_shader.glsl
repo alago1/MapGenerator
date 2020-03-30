@@ -5,6 +5,6 @@ uniform mat4 matrix;
 varying vec4 interpolated_color;
 
 void main() {
-    interpolated_color = color;
     gl_Position = matrix * position;
+    interpolated_color = color;
 }

@@ -9,7 +9,7 @@ public class MapGLSurfaceView extends GLSurfaceView {
 
     private MapRenderer renderer;
 
-    private final float TOUCH_SCALE_FACTOR = 1.0f / 320;
+    private final float TOUCH_SCALE_FACTOR = 50.0f / 180f;
     private float previousX;
     private float previousY;
 
@@ -39,12 +39,13 @@ public class MapGLSurfaceView extends GLSurfaceView {
 //                if(x < getWidth()/2)
 //                    dy *= -1;
 
-                float new_mapAngle = renderer.getMapAngle() - (dx * TOUCH_SCALE_FACTOR);
+                float new_mapAngle = renderer.getMapAngle() + (dx * TOUCH_SCALE_FACTOR);
                 renderer.setMapAngle(new_mapAngle);
 
                 if(!renderer.isCameraLocked()){
                     float new_cameraAngle = renderer.getCameraAngle() - (dy * TOUCH_SCALE_FACTOR);
-                    renderer.setCameraAngle(new_cameraAngle);
+                    if(new_cameraAngle < 90 && new_cameraAngle > -0.01f)
+                        renderer.setCameraAngle(new_cameraAngle);
                 }
                 requestRender();
         }

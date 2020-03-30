@@ -37,12 +37,14 @@ public class MainActivity extends AppCompatActivity {
 //        int minLevelOfDetail = (int) (Math.sqrt(3*width*height/Math.pow(2, 15)) + 1);
 
         //FIXME: Make sure the lod is valid (sufficiently big so that the FacesBuffer fits in a Short)
+        //FIXME: Only allow lod that are divisors of mapWidth and mapHeight
+        //TODO: Standardize mapWidth & mapHeight (disallow primes and other number with low number of divisors)
         mapSurfaceView = findViewById(R.id.map_surface_view);
         mapSurfaceView.setEGLContextClientVersion(2);
         //width:500 height:500 lod:4
-        mapGen = new MapGenerator(100, 200, 10f, new float[]{0.0f, 0.0f}, 1);
+        mapGen = new MapGenerator(500, 500, 10f, new float[]{0.0f, 0.0f}, 4);
         mapGen.UseNoiseMap(1, 4, 1.5f, 0.25f);
-//        mapGen.UseFalloffMap(3f, 2.2f);
+        mapGen.UseFalloffMap(3f, 2.2f);
         mapGen.CustomizeTexture(MapGenerator.TextureStyle.COLOR, TexturePack());
 
         mapRenderer = new MapRenderer(this, mapGen);

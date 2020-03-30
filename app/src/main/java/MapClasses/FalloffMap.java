@@ -1,7 +1,5 @@
 package MapClasses;
 
-import MapClasses.MapGenerator;
-import MapClasses.MapLayer;
 
 public class FalloffMap extends MapLayer {
 
