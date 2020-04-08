@@ -31,21 +31,24 @@ public class MapGLSurfaceView extends GLSurfaceView {
 
         switch(e.getAction()){
             case MotionEvent.ACTION_MOVE:
-                float dx = x - previousX;
-                float dy = y - previousY;
+                if(!renderer.isEditMode()) {
+                    float dx = x - previousX;
+                    float dy = y - previousY;
 
-//                if(y < getHeight()/2)
-//                    dx *= -1;
-//                if(x < getWidth()/2)
-//                    dy *= -1;
+                    if (renderer.isCameraLocked() && y < getHeight() / 2)
+                        dx *= -1;
 
-                float new_mapAngle = renderer.getMapAngle() + (dx * TOUCH_SCALE_FACTOR);
-                renderer.setMapAngle(new_mapAngle);
+                    float new_mapAngle = renderer.getMapAngle() + (dx * TOUCH_SCALE_FACTOR);
+                    renderer.setMapAngle(new_mapAngle);
 
-                if(!renderer.isCameraLocked()){
-                    float new_cameraAngle = renderer.getCameraAngle() - (dy * TOUCH_SCALE_FACTOR);
-                    if(new_cameraAngle < 90 && new_cameraAngle > -0.01f)
-                        renderer.setCameraAngle(new_cameraAngle);
+                    if (!renderer.isCameraLocked()) {
+                        float new_cameraAngle = renderer.getCameraAngle() - (dy * TOUCH_SCALE_FACTOR);
+                        if (new_cameraAngle < 90 && new_cameraAngle > -0.01f)
+                            renderer.setCameraAngle(new_cameraAngle);
+                    }
+                }
+                else{
+                    //mark selected pixels
                 }
                 requestRender();
         }

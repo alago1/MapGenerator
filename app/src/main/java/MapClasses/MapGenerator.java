@@ -48,6 +48,8 @@ public class MapGenerator {
         }
 
         for(int i = 0; i < mapSum.length; i++){
+//            mapSum[i] = (float) (Math.floor(mapSum[i]*10)/10.0);
+
             mapSum[i] = Math.max(mapSum[i], 0.001f);
             mapSum[i] = Math.min(mapSum[i], 0.999f);
         }

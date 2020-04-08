@@ -1,6 +1,5 @@
 package MapClasses;
 
-import MapClasses.MapGenerator;
 
 public abstract class MapLayer{
 

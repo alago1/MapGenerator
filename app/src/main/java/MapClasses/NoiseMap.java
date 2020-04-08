@@ -64,7 +64,9 @@ public class NoiseMap extends MapLayer {
                     frequency *= lacunarity;
                 }
 
+//                noiseHeight = Math.round(Math.pow(noiseHeight, 1.2f) *10)/10.0f;
                 noiseMap[vertexIndex] = noiseHeight;
+
 
                 if(noiseHeight > maxNoiseHeight){
                     maxNoiseHeight = noiseHeight;
@@ -79,5 +81,6 @@ public class NoiseMap extends MapLayer {
                 map[i] *= MapLayer.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[i]);
         }
     }
+
 
 }

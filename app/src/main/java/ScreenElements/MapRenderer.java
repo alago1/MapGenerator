@@ -29,8 +29,8 @@ public class MapRenderer implements GLSurfaceView.Renderer {
                                         0, 0, 0, 0,
                                         0, 0, 0, 1}; // initialized to 2D
 
-    private static final float RADIUS_2D = 2.5f;
-    private static final float RADIUS_3D = 4f;
+    private static final float RADIUS_2D = 2.5f; //2.5
+    private static final float RADIUS_3D = 3f; //4
 
     private float mapAngle = 0; // angle from x-axis (degrees)
     private float cameraAngle = 0; // angle from z-axis (degrees)
@@ -40,7 +40,7 @@ public class MapRenderer implements GLSurfaceView.Renderer {
     private float RADIUS = RADIUS_2D;
     private boolean cameraLock = true;
 
-
+    private boolean EditModeToggle = false;
 
     public MapRenderer(Context context, MapGenerator mapGen){
         this.context = context;
@@ -138,4 +138,11 @@ public class MapRenderer implements GLSurfaceView.Renderer {
         dimensionMatrix[10] = NEW_SPACE_RANK - 2;
     }
 
+    public void toggleEditMode(){
+        EditModeToggle = !EditModeToggle;
+    }
+
+    public boolean isEditMode(){
+        return EditModeToggle;
+    }
 }

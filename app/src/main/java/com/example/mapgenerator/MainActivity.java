@@ -21,7 +21,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Temporary Variables for prototyping
     // (High Chance to be deleted later):
-    Switch sw;
+    Switch sw_3dMode;
+    Switch sw_editMode;
 
 
     @Override
@@ -52,11 +53,19 @@ public class MainActivity extends AppCompatActivity {
         mapSurfaceView.setRenderer(mapRenderer);
         mapSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
-        sw = (Switch) findViewById(R.id.dimensions_switch);
-        sw.setOnClickListener(new View.OnClickListener(){
+        sw_3dMode = (Switch) findViewById(R.id.dimensions_switch);
+        sw_3dMode.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 transformSpace();
+            }
+        });
+
+        sw_editMode = (Switch) findViewById(R.id.edit_mode_switch);
+        sw_editMode.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                toggleEditMode();
             }
         });
     }
@@ -77,7 +86,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void transformSpace(){
-        mapRenderer.setSPACE_RANK(sw.isChecked() ? 3 : 2);
+        mapRenderer.setSPACE_RANK(sw_3dMode.isChecked() ? 3 : 2);
+        mapSurfaceView.requestRender();
+    }
+
+    public void toggleEditMode(){
+        mapRenderer.toggleEditMode();
+        if(sw_editMode.isChecked()){
+            mapRenderer.setSPACE_RANK(2);
+        }
         mapSurfaceView.requestRender();
     }
 }

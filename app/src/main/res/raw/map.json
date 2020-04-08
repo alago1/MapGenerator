@@ -1,0 +1,32 @@
+{
+  "__version__" : "0.0A",
+
+  "mapWidth" : 100,
+  "mapHeight" : 100,
+  "scale" : 10,
+  "offsetX" : 0,
+  "offsetY" : 0,
+  "lod" : 1,
+
+  "useNoiseMap" : true,
+  "NoiseMap" : {
+    "seed" : 1,
+    "octaves" : 4,
+    "persistence" : 1.5,
+    "lacunarity" : 0.25
+  },
+
+  "useFalloffMap": true,
+  "FalloffMap" : {
+    "shape": "square",
+    "intensity": 3,
+    "fallOffset": 2.2
+  },
+
+  "vertices_stride" : {
+    "position" : 3,
+    "color" : 4
+  },
+
+  "texture" : "grayscale"
+}
