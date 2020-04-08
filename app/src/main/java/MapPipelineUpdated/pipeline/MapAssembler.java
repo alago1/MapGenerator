@@ -1,5 +1,7 @@
 package MapPipelineUpdated.pipeline;
 
+import android.util.Log;
+
 import java.nio.Buffer;
 
 public class MapAssembler {
